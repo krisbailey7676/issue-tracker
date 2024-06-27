@@ -22,6 +22,7 @@ export async function PATCH(
             where: { id: issue.id },
             data: {
                 title: body.title,
+                status: body.status,
                 description: body.description
             }
         })

@@ -3,8 +3,8 @@ import ErrorMessage from "@/app/components/ErrorMessage";
 import Spinner from "@/app/components/Spinner";
 import { issueSchema } from "@/app/validationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Issue } from "@prisma/client";
-import { Button, Callout, TextField } from "@radix-ui/themes";
+import { Issue, Status } from "@prisma/client";
+import { Button, Callout, Select, TextField } from "@radix-ui/themes";
 import axios from "axios";
 import "easymde/dist/easymde.min.css";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = handleSubmit(async (data) => {
+    console.log("Data: ", data);
     try {
       setIsSubmitting(true);
       if (issue) await axios.patch("/api/issues/" + issue.id, data);
@@ -55,6 +56,25 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
           {...register("title")} // register function returns 4 props, so need to use spread operator
         ></TextField.Root>
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
+
+        <Controller
+          name="status"
+          control={control}
+          defaultValue={issue ? issue.status : Status.OPEN}
+          render={({ field }) => (
+            <Select.Root onValueChange={field.onChange} {...field}>
+              <Select.Trigger />
+              <Select.Content>
+                {Object.keys(Status).map((status) => (
+                  <Select.Item key={status} value={status}>
+                    {status}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          )}
+        />
+
         <Controller
           name="description"
           control={control}
